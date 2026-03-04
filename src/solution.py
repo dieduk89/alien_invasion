@@ -2,15 +2,16 @@ def solve(content: str) -> str:
     lines = content.split("\n")
     n = int(lines[0])
     current_line_index = 1
+    result = []
     for i in range(n):
         print("\n") 
         values = lines[current_line_index].split(" ")
         x,y,z = int(values[0]), int(values[1]), float(values[2])
         current_line_index += 1
         print(f"x: {x}, y: {y}, z: {z}")
-        aliens_positions(x,y,z,lines[current_line_index:current_line_index + x])
+        result.append(aliens_positions(x,y,z,lines[current_line_index:current_line_index + x]))
         current_line_index += x
-    return ""
+    return "\n".join(result)
 
 def aliens_positions(x: int, y: int, z: int, lines: list[str]) -> str:
     alien_map = []
@@ -31,9 +32,11 @@ def aliens_positions(x: int, y: int, z: int, lines: list[str]) -> str:
     ships = dict(sorted(ships.items(), key=lambda ship: (calculate_area(ship[1]), ship[0])))
 
     print(f"total ships found: {len(ships)}")
+    result = []
     for ship in ships:
-        print(f"{ship}: {calculate_position(ships[ship], z)}")
-    return ""
+        result.append(f"{ship}:{calculate_position(ships[ship], z)}")
+
+    return ";".join(result)
 
 
 
@@ -41,7 +44,7 @@ def calculate_position(coordinates: list[int], z: float) -> str:
     x1, y1, x2, y2 = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
     x = round(((x1 + x2) / 2 + 0.5) * z, 3)
     y = round(((y1 + y2) / 2 + 0.5) * z, 3)
-    return f"{x} {y}"
+    return f"{x:.3f},{y:.3f}"
     
 def calculate_area(coordinates: list[int]) -> int:
     x1, y1, x2, y2 = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
