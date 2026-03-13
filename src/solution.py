@@ -14,16 +14,13 @@ def solve(content: str) -> str:
     return "\n".join(result)
 
 def aliens_positions(x: int, y: int, z: int, lines: list[str]) -> str:
-    
-    layer_map = []
-    
+
     alien_map = []
     for line in lines:
         alien_map.append(line.split(" "))
     
     ships = {}
     for i in range(x):
-        layer_map.append([0] * y)
         for j in range(y):
             ship = alien_map[i][j]
             if ship >= "A" and ship <= "Z" or ship >= "a" and ship <= "z":
@@ -38,29 +35,27 @@ def aliens_positions(x: int, y: int, z: int, lines: list[str]) -> str:
     print(f"total ships found: {len(ships)}")
 
     result = []
-    current_layer = 1
     while len(ships) > 0:
         layer_result = []
         del_list = []
 
         for ship in ships.items():
-
             coordinates = ship[1]
             x1, y1, x2, y2 = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
-
-            check = [layer_map[i][j] for i in range(x1, x2 + 1) for j in range(y1, y2 + 1)].count(current_layer)
-            if check == 0:
-
+            check = len([alien_map[i][j] for i in range(x1, x2 + 1) for j in range(y1, y2 + 1) if alien_map[i][j] == ship[0] or alien_map[i][j] == " "])
+            if check == calculate_area(coordinates):
                 layer_result.append(f"{ship[0]}:{calculate_position(ship[1], z)}")
                 del_list.append(ship[0])
-
-                for i in range(x1, x2 + 1):
-                    for j in range(y1, y2 + 1):
-                        layer_map[i][j] = current_layer
         
+        for ship in del_list:
+            coordinates = ships[ship]
+            x1, y1, x2, y2 = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
+            for i in range(x1, x2 + 1):
+                for j in range(y1, y2 + 1):
+                    alien_map[i][j] = " "
+
         ships = {ship: ships[ship] for ship in ships if ship not in del_list}
         result.append(layer_result)
-        current_layer += 1
     
     return " ".join([";".join(layer) for layer in result])
 
@@ -74,15 +69,4 @@ def calculate_position(coordinates: list[int], z: float) -> str:
     
 def calculate_area(coordinates: list[int]) -> int:
     x1, y1, x2, y2 = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
-    return (x2 - x1 + 1) * (y2 - y1 + 1)
-
-def fill_layer(layer_map: list[list[int]], coordinates: list[int], layer: int) -> bool:
-   
-    x1, y1, x2, y2 = coordinates[0], coordinates[1], coordinates[2], coordinates[3]
-    check = [layer_map[i][j] for i in range(x1, x2 + 1) for j in range(y1, y2 + 1)].count(layer)
-    if check > 0:
-        return False
-    for i in range(x1, x2 + 1):
-        for j in range(y1, y2 + 1):
-            layer_map[i][j] = layer
-    return True            
+    return (x2 - x1 + 1) * (y2 - y1 + 1)           
